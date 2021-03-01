@@ -1,4 +1,7 @@
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import Home from './booking/Home.js'
 import Login from './auth/Login.js'
 import Register from './auth/Register.js'
@@ -7,7 +10,8 @@ import TopNav from './components/TopNav.js'
 function App() {
   return (
     <BrowserRouter>
-    <TopNav />
+      <TopNav />
+      <ToastContainer />
       <Switch>
         <Route exact path="/" component={Home} />
         <Route exact path="/login" component={Login} />
