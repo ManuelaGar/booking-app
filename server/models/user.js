@@ -39,6 +39,17 @@ const userSchema = new Schema({
         return next();
     }
   });
+
+  userSchema.methods.comparePassword = function (password, next) {
+      bcrypt.compare(password, this.password, function(err, match) {
+        if(err) {
+            console.log('Compare password error: ', err);
+            return next(err, false);
+        }
+        console.log('Passwords match', match);
+        return next(null, match);
+      })
+  }
   
   const User = mongoose.model('User', userSchema);
 

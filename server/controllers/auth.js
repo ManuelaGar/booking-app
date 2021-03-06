@@ -1,6 +1,8 @@
 import User from '../models/user.js';
+import jwt from 'jsonwebtoken';
 
 export const register = async (req, res) => {
+    console.log(req.body);
     const {name, password, email} = req.body;
 
     if(!name) return res.status(400).send('Name is required')
@@ -17,6 +19,32 @@ export const register = async (req, res) => {
         return res.json({ ok: true });
     } catch (error) {
         console.log('Create user failed: ', err);
+        return res.status(400).send('Error. Try again.');
+    }
+};
+
+export const login = async (req, res) => {
+    const { password, email } = req.body;
+    try {
+        let user = await User.findOne({ email }).exec();
+        if(!user) res.status(400).send('User not found');
+
+        user.comparePassword(password, (err, match) => {
+            if (err || !match) res.status(400).send('Wrong password');
+            let token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+            res.json({ token, user: {
+                _id: user._id,
+                name : user.name,
+                email: user.email,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+            } });
+        });
+        
+        console.log('Login successful', user);
+        //return res.json({ ok: true });
+    } catch (error) {
+        console.log('Login user failed: ', err);
         return res.status(400).send('Error. Try again.');
     }
 };

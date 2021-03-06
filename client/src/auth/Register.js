@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import axios from 'axios'
 import { toast } from 'react-toastify';
 import { register } from '../actions/auth.js'
 
@@ -21,7 +20,9 @@ function Register({ history }) {
         history.push('/login');
       } catch (error) {
         console.log(error);
-        if(error.response.status === 400) toast.error(error.response.data);
+        if(error.response) {
+          if (error.response.status === 400) toast.error(error.response.data);
+        }
       }
     };
 

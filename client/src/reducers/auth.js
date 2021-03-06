@@ -1,4 +1,12 @@
-export function authReducer (state = { name: 'Manuela', role: 'Seller' }, action) {
+let userState;
+
+if (window.localStorage.getItem('auth')) {
+  userState = JSON.parse(window.localStorage.getItem('auth'));
+} else {
+  userState = null;
+}
+
+export function authReducer (state = userState, action) {
     switch (action.type) {
       case "LOGGED_IN_USER":
         return {...state, ...action.payload};
