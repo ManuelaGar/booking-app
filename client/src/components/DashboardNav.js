@@ -1,0 +1,18 @@
+import { Link } from 'react-router-dom'
+
+function DashboardNav() {
+    const activeRoute = window.location.pathname;
+
+    return (
+        <ul className="nav nav-tabs">
+            <li className="nav-item">
+                <Link className={`nav-link ${ activeRoute === "/dashboard" && "active"}`} to="/dashboard">Your Bookings</Link>
+            </li>
+            <li className="nav-item">
+                <Link className={`nav-link ${ activeRoute === "/dashboard/seller" && "active"}`}  to="/dashboard/seller">Your Hotels</Link>
+            </li>
+        </ul>
+    );
+}
+
+export default DashboardNav;

@@ -20,7 +20,7 @@ function TopNav() {
       <div className="nav bg-light d-flex justify-content-between">
         <Link className="nav-link" to="/">Home</Link>
         { auth !== null && (
-          <button type="button" class="btn btn-link" role="link" style={{textDecoration: "none"}} onClick={logout}>Logout</button>
+          <button type="button" className="btn btn-link" role="link" style={{textDecoration: "none"}} onClick={logout}>Logout</button>
         )}
         { auth === null && (
           <>

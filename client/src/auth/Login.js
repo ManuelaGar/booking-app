@@ -24,7 +24,7 @@ function Login({ history }) {
           type: 'LOGGED_IN_USER',
           payload: res.data,
         });
-        history.push('/');
+        history.push('/dashboard');
       }
     } catch (error) {
       console.log(error);
