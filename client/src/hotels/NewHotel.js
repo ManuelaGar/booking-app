@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import AlgoliaPlaces from "algolia-places-react";
+import GooglePlacesAutocomplete from "react-google-places-autocomplete";
+import { DatePicker } from "antd";
+import moment from "moment";
+
+const { RangePicker } = DatePicker;
+const dateFormat = "YYYY/MM/DD";
 
 function NewHotel() {
+  const [location, setLocation] = useState("");
   const [values, setValues] = useState({
     title: "",
     content: "",
-    location: "",
+    location: location,
     image: "",
     price: "",
     from: "",
@@ -64,6 +70,16 @@ function NewHotel() {
             className="form-control m-2"
             value={values.content}
           />
+          <GooglePlacesAutocomplete
+            className="form-control"
+            apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
+            apiOptions={{ language: "es" }}
+            selectProps={{
+              location,
+              onChange: setLocation,
+              placeholder: "Location",
+            }}
+          />
           <input
             type="number"
             name="price"
@@ -81,6 +97,17 @@ function NewHotel() {
             value={values.bed}
           />
         </div>
+        <RangePicker
+          className="form-control m-2"
+          format={dateFormat}
+          disabledDate={(current) =>
+            current && current.valueOf() < moment().subtract(1, "days")
+          }
+          onChange={(date, dateString) =>
+            setValues({ ...values, from: dateString[0], to: dateString[1] })
+          }
+        />
+
         <button className="btn btn-outline-primary m-2">Save</button>
       </form>
     );

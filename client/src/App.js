@@ -8,7 +8,7 @@ import Register from "./auth/Register.js";
 import TopNav from "./components/TopNav.js";
 import Dashboard from "./user/Dashboard.js";
 import DashboardSeller from "./user/DashboardSeller.js";
-import NewHotel from "./hotels/New.js";
+import NewHotel from "./hotels/NewHotel.js";
 import PrivateRoute from "./components/PrivateRoute.js";
 import StripeCallback from "./stripe/StripeCallback.js";
 
