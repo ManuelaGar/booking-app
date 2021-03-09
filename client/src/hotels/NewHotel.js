@@ -1,18 +1,23 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
-import { DatePicker } from "antd";
+import { DatePicker, Select } from "antd";
 import moment from "moment";
+import { useSelector } from "react-redux";
+import { createHotel } from "../actions/hotel.js";
 
+const { Option } = Select;
 const { RangePicker } = DatePicker;
 const dateFormat = "YYYY/MM/DD";
 
 function NewHotel() {
+  const { auth } = useSelector((state) => ({ ...state }));
+  const { token } = auth;
+
   const [location, setLocation] = useState("");
   const [values, setValues] = useState({
     title: "",
     content: "",
-    location: location,
     image: "",
     price: "",
     from: "",
@@ -23,7 +28,15 @@ function NewHotel() {
     "https://via.placeholder.com/100x100.png?text=PREVIEW"
   );
 
-  function handleSubmit(event) {}
+  async function handleSubmit(event) {
+    event.preventDefault();
+    let res = await createHotel(token, hotelData);
+    console.log("Hotel create res", res);
+    toast("New hotel is posted");
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
 
   function handleImageChange(event) {
     setPreview(URL.createObjectURL(event.target.files[0]));
@@ -88,14 +101,17 @@ function NewHotel() {
             className="form-control m-2"
             value={values.price}
           />
-          <input
-            type="number"
-            name="bed"
-            onChange={handleChange}
-            placeholder="Number of Beds"
-            className="form-control m-2"
-            value={values.bed}
-          />
+          <Select
+            className="w-100 m-2"
+            size="large"
+            placeholder="Number of beds"
+            onChange={(value) => setValues({ ...values, bed: value })}
+          >
+            <Option key={1}>{1}</Option>
+            <Option key={2}>{2}</Option>
+            <Option key={3}>{3}</Option>
+            <Option key={4}>{4}</Option>
+          </Select>
         </div>
         <RangePicker
           className="form-control m-2"
@@ -131,6 +147,7 @@ function NewHotel() {
               className="img img-fluid m-2"
             ></img>
             <pre>{JSON.stringify(values, null, 4)}</pre>
+            {JSON.stringify(location.label, null, 4)}
           </div>
         </div>
       </div>
