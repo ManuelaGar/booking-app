@@ -1,35 +1,57 @@
-import { Link } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
 
 function TopNav() {
-    const dispatch = useDispatch();
-    const { auth } = useSelector((state) => ({ ...state }));
-    const history = useHistory();
+  const dispatch = useDispatch();
+  const { auth } = useSelector((state) => ({ ...state }));
+  const history = useHistory();
 
-    function logout() {
-      dispatch({
-        type: 'LOGOUT',
-        payload: null,
-      });
-      window.localStorage.removeItem('auth');
-      history.push('/login');
-    }
-
-    return (
-      <div className="nav bg-light d-flex justify-content-between">
-        <Link className="nav-link" to="/">Home</Link>
-        { auth !== null && (
-          <button type="button" className="btn btn-link" role="link" style={{textDecoration: "none"}} onClick={logout}>Logout</button>
-        )}
-        { auth === null && (
-          <>
-            <Link className="nav-link" to="/login">Login</Link>
-            <Link className="nav-link" to="/register">Register</Link>
-          </>
-        )}
-      </div>
-    )
+  function logout() {
+    dispatch({
+      type: "LOGOUT",
+      payload: null,
+    });
+    window.localStorage.removeItem("auth");
+    history.push("/login");
   }
 
-  export default TopNav;
+  return (
+    <div className="nav bg-light d-flex justify-content-between">
+      <Link className="nav-link" to="/">
+        Home
+      </Link>
+
+      {auth !== null && (
+        <Link className="nav-link" to="/dashboard">
+          Dashboard
+        </Link>
+      )}
+
+      {auth !== null && (
+        <button
+          type="button"
+          className="btn btn-link"
+          role="link"
+          style={{ textDecoration: "none" }}
+          onClick={logout}
+        >
+          Logout
+        </button>
+      )}
+
+      {auth === null && (
+        <>
+          <Link className="nav-link" to="/login">
+            Login
+          </Link>
+          <Link className="nav-link" to="/register">
+            Register
+          </Link>
+        </>
+      )}
+    </div>
+  );
+}
+
+export default TopNav;
