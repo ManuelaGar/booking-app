@@ -54,3 +54,17 @@ export async function sellerHotels(req, res) {
     .exec();
   res.send(allHotels);
 }
+
+export async function remove(req, res) {
+  let removedHotel = await Hotel.findByIdAndDelete(req.params.hotelId)
+    .select("-image.data")
+    .exec();
+  res.json(removedHotel);
+}
+
+export async function read(req, res) {
+  let hotel = await Hotel.findById(req.params.hotelId)
+    .select("-image.data")
+    .exec();
+  res.json(hotel);
+}

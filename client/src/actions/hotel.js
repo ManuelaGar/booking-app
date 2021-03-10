@@ -18,7 +18,6 @@ export function diffDays(from, to) {
   const end = new Date(to);
 
   const difference = Math.round(Math.abs((start - end) / day));
-  console.log(difference);
   return difference;
 }
 
@@ -28,4 +27,19 @@ export async function sellerHotels(token) {
       Authorization: `Bearer ${token}`,
     },
   });
+}
+
+export async function deleteHotel(token, hotelId) {
+  return await axios.delete(
+    `${process.env.REACT_APP_API}/delete-hotel/${hotelId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}
+
+export async function readHotel(hotelId) {
+  return await axios.get(`${process.env.REACT_APP_API}/hotel/${hotelId}`);
 }

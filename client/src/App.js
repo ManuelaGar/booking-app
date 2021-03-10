@@ -8,6 +8,7 @@ import Register from "./auth/Register.js";
 import TopNav from "./components/TopNav.js";
 import Dashboard from "./user/Dashboard.js";
 import DashboardSeller from "./user/DashboardSeller.js";
+import EditHotel from "./hotels/EditHotel.js";
 import NewHotel from "./hotels/NewHotel.js";
 import PrivateRoute from "./components/PrivateRoute.js";
 import StripeCallback from "./stripe/StripeCallback.js";
@@ -33,6 +34,7 @@ function App() {
           path="/stripe/callback"
           component={StripeCallback}
         />
+        <PrivateRoute exact path="/hotel/edit/:hotelId" component={EditHotel} />
       </Switch>
     </BrowserRouter>
   );
