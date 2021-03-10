@@ -1,14 +1,8 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import GooglePlacesAutocomplete from "react-google-places-autocomplete";
-import { DatePicker, Select } from "antd";
-import moment from "moment";
 import { useSelector } from "react-redux";
 import { createHotel } from "../actions/hotel.js";
-
-const { Option } = Select;
-const { RangePicker } = DatePicker;
-const dateFormat = "YYYY/MM/DD";
+import HotelCreateForm from "../components/forms/HotelCreateForm.js";
 
 function NewHotel() {
   const { auth } = useSelector((state) => ({ ...state }));
@@ -30,12 +24,30 @@ function NewHotel() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    let res = await createHotel(token, hotelData);
-    console.log("Hotel create res", res);
-    toast("New hotel is posted");
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+
+    let hotelData = new FormData();
+    hotelData.append("title", values.title);
+    hotelData.append("content", values.content);
+    hotelData.append("location", location.label);
+    values.image && hotelData.append("image", values.image);
+    hotelData.append("price", values.price);
+    hotelData.append("from", values.from);
+    hotelData.append("to", values.to);
+    hotelData.append("bed", values.bed);
+
+    console.log([...hotelData]);
+
+    try {
+      let res = await createHotel(token, hotelData);
+      console.log("Hotel create res", res);
+      toast.success("New hotel is posted");
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data);
+    }
   }
 
   function handleImageChange(event) {
@@ -54,81 +66,6 @@ function NewHotel() {
     });
   }
 
-  function hotelForm() {
-    return (
-      <form onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label className="btn btn-outline-secondary btn-block m-2 text-left">
-            Image
-            <input
-              type="file"
-              name="image"
-              onChange={handleImageChange}
-              accept="image/*"
-              hidden
-            />
-          </label>
-          <input
-            type="text"
-            name="title"
-            onChange={handleChange}
-            placeholder="Title"
-            className="form-control m-2"
-            value={values.title}
-          />
-          <textarea
-            name="content"
-            onChange={handleChange}
-            placeholder="Content"
-            className="form-control m-2"
-            value={values.content}
-          />
-          <GooglePlacesAutocomplete
-            className="form-control"
-            apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
-            apiOptions={{ language: "es" }}
-            selectProps={{
-              location,
-              onChange: setLocation,
-              placeholder: "Location",
-            }}
-          />
-          <input
-            type="number"
-            name="price"
-            onChange={handleChange}
-            placeholder="Price"
-            className="form-control m-2"
-            value={values.price}
-          />
-          <Select
-            className="w-100 m-2"
-            size="large"
-            placeholder="Number of beds"
-            onChange={(value) => setValues({ ...values, bed: value })}
-          >
-            <Option key={1}>{1}</Option>
-            <Option key={2}>{2}</Option>
-            <Option key={3}>{3}</Option>
-            <Option key={4}>{4}</Option>
-          </Select>
-        </div>
-        <RangePicker
-          className="form-control m-2"
-          format={dateFormat}
-          disabledDate={(current) =>
-            current && current.valueOf() < moment().subtract(1, "days")
-          }
-          onChange={(date, dateString) =>
-            setValues({ ...values, from: dateString[0], to: dateString[1] })
-          }
-        />
-
-        <button className="btn btn-outline-primary m-2">Save</button>
-      </form>
-    );
-  }
-
   return (
     <>
       <div className="container-fluid bg-secondary p-5 text-center">
@@ -138,7 +75,15 @@ function NewHotel() {
         <div className="row">
           <div className="col-md-10">
             <br />
-            {hotelForm()}
+            <HotelCreateForm
+              values={values}
+              setValues={setValues}
+              location={location}
+              setLocation={setLocation}
+              handleChange={handleChange}
+              handleImageChange={handleImageChange}
+              handleSubmit={handleSubmit}
+            />
           </div>
           <div className="col-md-2">
             <img

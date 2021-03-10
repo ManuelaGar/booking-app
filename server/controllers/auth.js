@@ -2,21 +2,20 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
-  console.log(req.body);
-  const { name, password, email } = req.body;
-
-  if (!name) return res.status(400).send("Name is required");
-  if (!password || password.length < 6)
-    return res
-      .status(400)
-      .send("Password is required and should be min 6 characters");
-
-  let isEmailInDB = await User.findOne({ email }).exec();
-  if (isEmailInDB) return res.status(400).send("Email is taken");
-
-  const newUser = User(req.body);
-
   try {
+    const { name, password, email } = req.body;
+
+    if (!name) return res.status(400).send("Name is required");
+    if (!password || password.length < 6)
+      return res
+        .status(400)
+        .send("Password is required and should be min 6 characters");
+
+    let isEmailInDB = await User.findOne({ email }).exec();
+    if (isEmailInDB) return res.status(400).send("Email is taken");
+
+    const newUser = User(req.body);
+
     await newUser.save();
     console.log("User created", newUser);
     return res.json({ ok: true });
@@ -27,8 +26,9 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { password, email } = req.body;
   try {
+    const { password, email } = req.body;
+
     let user = await User.findOne({ email }).exec();
     if (!user) res.status(400).send("User not found");
 
@@ -55,7 +55,7 @@ export const login = async (req, res) => {
     console.log("Login successful", user);
     //return res.json({ ok: true });
   } catch (error) {
-    console.log("Login user failed: ", err);
+    console.log("Login user failed: ", error);
     return res.status(400).send("Error. Try again.");
   }
 };

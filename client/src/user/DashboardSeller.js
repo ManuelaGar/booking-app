@@ -4,12 +4,24 @@ import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { HomeOutlined } from "@ant-design/icons";
 import { createConnectAccount } from "../actions/stripe.js";
-import { useState } from "react";
+import { sellerHotels } from "../actions/hotel.js";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import HotelCard from "../components/cards/HotelCard.js";
 
 function DashboardSeller() {
   const { auth } = useSelector((state) => ({ ...state }));
+  const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    loadSellerHotels();
+  }, []);
+
+  async function loadSellerHotels() {
+    let { data } = await sellerHotels(auth.token);
+    setHotels(data);
+  }
 
   async function handleClick() {
     setLoading(true);
@@ -36,6 +48,16 @@ function DashboardSeller() {
               + Add New
             </Link>
           </div>
+        </div>
+        <div className="row">
+          {hotels.map((h) => (
+            <HotelCard
+              key={h._id}
+              h={h}
+              owner={true}
+              showViewMoreButton={false}
+            />
+          ))}
         </div>
       </div>
     );
