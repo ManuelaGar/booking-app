@@ -74,7 +74,7 @@ function EditHotel({ match }) {
       }, 1000);
     } catch (error) {
       console.log(error);
-      //toast.error(error.response.data.err);
+      toast.error(error.response.data.err);
     }
   }
 
