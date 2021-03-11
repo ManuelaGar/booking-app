@@ -11,13 +11,13 @@ function EditHotel({ match }) {
   const [values, setValues] = useState({
     title: "",
     content: "",
-    image: "",
     location: "",
     price: "",
     from: "",
     to: "",
     bed: "",
   });
+  const [image, setImage] = useState("");
   const [preview, setPreview] = useState(
     "https://via.placeholder.com/100x100.png?text=PREVIEW"
   );
@@ -32,13 +32,13 @@ function EditHotel({ match }) {
       setValues({ ...values, ...res.data });
       setPreview(`${process.env.REACT_APP_API}/hotels/image/${res.data._id}`);
     } catch (error) {
-      toast.error("Error getting hotel data.");
+      toast.error("Error getting hotel image.");
     }
   }
 
   function handleImageChange(event) {
     setPreview(URL.createObjectURL(event.target.files[0]));
-    setValues({ ...values, image: event.target.files[0] });
+    setImage(event.target.files[0]);
   }
 
   function handleChange(event) {
@@ -59,7 +59,7 @@ function EditHotel({ match }) {
     hotelData.append("title", values.title);
     hotelData.append("content", values.content);
     hotelData.append("location", values.location);
-    values.image && hotelData.append("image", values.image);
+    image && hotelData.append("image", image);
     hotelData.append("price", values.price);
     hotelData.append("from", values.from);
     hotelData.append("to", values.to);
@@ -68,7 +68,7 @@ function EditHotel({ match }) {
     try {
       let res = await updateHotel(token, hotelData, match.params.hotelId);
       console.log("Hotel update response", res);
-      toast.success(`${res.data.title} is updated`);
+      toast.success(`${res.data.title} was updated successfully!`);
       setTimeout(() => {
         window.location.reload();
       }, 1000);
