@@ -4,7 +4,7 @@ import moment from "moment";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-const dateFormat = "YYYY/MM/DD";
+const dateFormat = "YYYY-MM-DD";
 
 function HotelEditForm({
   values,
@@ -13,11 +13,7 @@ function HotelEditForm({
   handleImageChange,
   handleSubmit,
 }) {
-  const { location } = values;
-  function setLocation(text) {
-    this.placesRef && this.placesRef.setAddressText(text);
-  }
-
+  const { location, from, to } = values;
   return (
     <form onSubmit={handleSubmit}>
       <div className="form-group">
@@ -48,13 +44,13 @@ function HotelEditForm({
         />
         {location && location.length && (
           <GooglePlacesAutocomplete
-            className="form-control"
+            className="form-control ml-20"
             apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
             apiOptions={{ language: "es" }}
             selectProps={{
               location,
-              onChange: () => {
-                setValues({ ...values, location: location });
+              onChange: (value) => {
+                setValues({ ...values, location: value.label });
               },
               placeholder: `${location}`,
             }}
@@ -73,6 +69,7 @@ function HotelEditForm({
           size="large"
           placeholder="Number of beds"
           onChange={(value) => setValues({ ...values, bed: value })}
+          value={values.bed}
         >
           <Option key={1}>{1}</Option>
           <Option key={2}>{2}</Option>
@@ -80,16 +77,22 @@ function HotelEditForm({
           <Option key={4}>{4}</Option>
         </Select>
       </div>
-      <RangePicker
-        className="form-control m-2"
-        format={dateFormat}
-        disabledDate={(current) =>
-          current && current.valueOf() < moment().subtract(1, "days")
-        }
-        onChange={(date, dateString) =>
-          setValues({ ...values, from: dateString[0], to: dateString[1] })
-        }
-      />
+      {from && to && (
+        <RangePicker
+          defaultValue={[
+            moment(from.split("T")[0], dateFormat),
+            moment(to.split("T")[0], dateFormat),
+          ]}
+          className="form-control m-2"
+          format={dateFormat}
+          disabledDate={(current) =>
+            current && current.valueOf() < moment().subtract(1, "days")
+          }
+          onChange={(date, dateString) =>
+            setValues({ ...values, from: dateString[0], to: dateString[1] })
+          }
+        />
+      )}
 
       <button className="btn btn-outline-primary m-2">Save</button>
     </form>

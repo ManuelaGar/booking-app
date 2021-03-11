@@ -43,3 +43,15 @@ export async function deleteHotel(token, hotelId) {
 export async function readHotel(hotelId) {
   return await axios.get(`${process.env.REACT_APP_API}/hotel/${hotelId}`);
 }
+
+export async function updateHotel(token, data, hotelId) {
+  return await axios.put(
+    `${process.env.REACT_APP_API}/update-hotel/${hotelId}`,
+    data,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}

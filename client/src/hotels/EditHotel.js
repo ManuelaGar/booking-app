@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
-import { readHotel } from "../actions/hotel.js";
+import { readHotel, updateHotel } from "../actions/hotel.js";
 import HotelEditForm from "../components/forms/HotelEditForm.js";
 
 function EditHotel({ match }) {
@@ -36,8 +36,6 @@ function EditHotel({ match }) {
     }
   }
 
-  async function handleSubmit(event) {}
-
   function handleImageChange(event) {
     setPreview(URL.createObjectURL(event.target.files[0]));
     setValues({ ...values, image: event.target.files[0] });
@@ -52,6 +50,32 @@ function EditHotel({ match }) {
         [name]: value,
       };
     });
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    let hotelData = new FormData();
+    hotelData.append("title", values.title);
+    hotelData.append("content", values.content);
+    hotelData.append("location", values.location);
+    values.image && hotelData.append("image", values.image);
+    hotelData.append("price", values.price);
+    hotelData.append("from", values.from);
+    hotelData.append("to", values.to);
+    hotelData.append("bed", values.bed);
+
+    try {
+      let res = await updateHotel(token, hotelData, match.params.hotelId);
+      console.log("Hotel update response", res);
+      toast.success(`${res.data.title} is updated`);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.log(error);
+      //toast.error(error.response.data.err);
+    }
   }
 
   return (
@@ -87,28 +111,3 @@ function EditHotel({ match }) {
 }
 
 export default EditHotel;
-
-//   async function handleSubmit(event) {
-//     event.preventDefault();
-
-//     let hotelData = new FormData();
-//     hotelData.append("title", values.title);
-//     hotelData.append("content", values.content);
-//     hotelData.append("location", location.label);
-//     values.image && hotelData.append("image", values.image);
-//     hotelData.append("price", values.price);
-//     hotelData.append("from", values.from);
-//     hotelData.append("to", values.to);
-//     hotelData.append("bed", values.bed);
-
-//     try {
-//       let res = await readHotel(hotelData);
-//       toast.success("New hotel is edited");
-//       setTimeout(() => {
-//         window.location.reload();
-//       }, 1000);
-//     } catch (error) {
-//       console.log(error);
-//       toast.error(error.response.data);
-//     }
-//   }
