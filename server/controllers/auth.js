@@ -17,7 +17,6 @@ export const register = async (req, res) => {
     const newUser = User(req.body);
 
     await newUser.save();
-    console.log("User created", newUser);
     return res.json({ ok: true });
   } catch (error) {
     console.log("Create user failed: ", err);
@@ -30,7 +29,7 @@ export const login = async (req, res) => {
     const { password, email } = req.body;
 
     let user = await User.findOne({ email }).exec();
-    if (!user) res.status(400).send("User not found");
+    if (!user) return res.status(400).send("User not found");
 
     user.comparePassword(password, (err, match) => {
       if (err || !match) res.status(400).send("Wrong password");
@@ -51,9 +50,6 @@ export const login = async (req, res) => {
         },
       });
     });
-
-    console.log("Login successful", user);
-    //return res.json({ ok: true });
   } catch (error) {
     console.log("Login user failed: ", error);
     return res.status(400).send("Error. Try again.");

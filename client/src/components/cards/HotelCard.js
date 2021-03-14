@@ -35,7 +35,7 @@ function HotelCard({
                 {h.title}{" "}
                 <span className="float-right text-primary">
                   {currencyFormatter({
-                    amount: h.price,
+                    amount: h.price * 100,
                     currency: "usd",
                   })}
                 </span>
@@ -48,7 +48,9 @@ function HotelCard({
                   {diffDays(h.from, h.to) <= 1 ? " day" : " days"}
                 </span>
               </p>
-              <p className="card-text">{h.bed}</p>
+              <p className="card-text">
+                {h.bed} {h.bed <= 1 ? "bed" : "beds"}
+              </p>
               <p className="card-text">
                 Available from {new Date(h.from).toLocaleDateString()}
               </p>

@@ -1,0 +1,29 @@
+.pointer {
+  cursor: pointer;
+}
+
+.ant-select-selector {
+  height: 50px !important;
+}
+
+.ant-select-selection-placeholder,
+.ant-select-selection-item {
+  margin-top: 5px;
+}
+
+.btn-square {
+  border-radius: 0;
+}
+
+.css-2b097c-container {
+  height: 50px;
+}
+
+.css-yk16xz-control {
+  height: 50px;
+  border-radius: 0;
+}
+
+.css-1pahdxg-control {
+  height: 50px;
+}

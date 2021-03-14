@@ -1,5 +1,6 @@
 import Hotel from "../models/hotel.js";
 import fs from "fs";
+import Order from "../models/order.js";
 
 export async function create(req, res) {
   try {
@@ -30,12 +31,11 @@ export async function create(req, res) {
 }
 
 export async function hotels(req, res) {
-  let allHotels = await Hotel.find({})
+  let allHotels = await Hotel.find({ from: { $gte: new Date() } })
     .limit(24)
     .select("-image.data")
     .populate("postedBy", "_id name")
     .exec();
-  console.log(allHotels);
   res.json(allHotels);
 }
 
@@ -92,4 +92,34 @@ export async function update(req, res) {
     console.log(error);
     res.status(400).send("Hotel update failed. Try again.");
   }
+}
+
+export async function userHotelBookings(req, res) {
+  const allOrders = await Order.find({ orderedBy: req.user._id })
+    .select("session")
+    .populate("hotel", "-image.data")
+    .populate("orderedBy", "_id name")
+    .exec();
+  res.json(allOrders);
+}
+
+export async function isAlreadyBooked(req, res) {
+  const { hotelId } = req.params;
+  const userOrders = await Order.find({ orderedBy: req.user._id })
+    .select("hotel")
+    .exec();
+  let ids = [];
+  userOrders.forEach((u) => {
+    ids.push(u.hotel.toString());
+  });
+  res.json({ ok: ids.includes(hotelId) });
+}
+
+export async function searchListings(req, res) {
+  const { location, date, bed } = req.body;
+  const from = date.split(",");
+  let result = await Hotel.find({ from: { $gte: new Date(from[0]) }, location })
+    .select("-image.data")
+    .exec();
+  res.json(result);
 }

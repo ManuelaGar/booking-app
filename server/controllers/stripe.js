@@ -1,6 +1,8 @@
 import User from "../models/user.js";
 import Stripe from "stripe";
 import queryString from "query-string";
+import Hotel from "../models/hotel.js";
+import Order from "../models/order.js";
 
 const stripe = Stripe(process.env.STRIPE_SECRET);
 
@@ -85,5 +87,67 @@ export async function payoutSetting(req, res) {
     res.json(loginLink);
   } catch (error) {
     console.log("STRIPE PAYOUT SETTING ERR", error);
+  }
+}
+
+export async function stripeSessionId(req, res) {
+  let hotel = await Hotel.findById(req.body.hotelId)
+    .populate("postedBy")
+    .exec();
+
+  const fee = hotel.price * 0.2;
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        name: hotel.title,
+        amount: hotel.price * 100,
+        currency: "usd",
+        quantity: 1,
+      },
+    ],
+    payment_intent_data: {
+      application_fee_amount: fee * 100,
+      transfer_data: {
+        destination: hotel.postedBy.stripe_account_id,
+      },
+    },
+    success_url: `${process.env.STRIPE_SUCCESS_URL}/${hotel._id}`,
+    cancel_url: process.env.STRIPE_CANCEL_URL,
+  });
+
+  await User.findByIdAndUpdate(req.user._id, { stripeSession: session }).exec();
+  res.send({
+    sessionId: session.id,
+  });
+}
+
+export async function stripeSuccess(req, res) {
+  try {
+    const { hotelId } = req.body;
+    const user = await User.findById(req.user._id).exec();
+    if (!user.stripeSession) return;
+    const session = await stripe.checkout.sessions.retrieve(
+      user.stripeSession.id
+    );
+    if (session.payment_status === "paid") {
+      const orderExists = await Order.findOne({
+        "session.id": session.id,
+      }).exec();
+      if (!orderExists) {
+        let newOrder = await new Order({
+          hotel: hotelId,
+          session: session,
+          orderedBy: user._id,
+        }).save();
+        await User.findByIdAndUpdate(user._id, {
+          $set: { stripeSession: {} },
+        });
+      }
+      return res.json({ success: true });
+    }
+  } catch (error) {
+    console.log("Stripe success err", error);
   }
 }

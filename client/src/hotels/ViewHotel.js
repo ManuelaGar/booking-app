@@ -1,14 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { readHotel, diffDays } from "../actions/hotel.js";
+import { getSessionId } from "../actions/stripe.js";
 import { toast } from "react-toastify";
 import moment from "moment";
+import { useSelector } from "react-redux";
+import { loadStripe } from "@stripe/stripe-js";
+import { isAlreadyBooked } from "../actions/hotel.js";
 
-function ViewHotel({ match }) {
+function ViewHotel({ match, history }) {
+  const { auth } = useSelector((state) => ({ ...state }));
+
   const [hotel, setHotel] = useState({});
   const [image, setImage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [alreadyBooked, setAlreadyBooked] = useState(false);
 
   useEffect(() => {
     loadSellerHotel();
+  }, []);
+
+  useEffect(() => {
+    if (auth && auth.token) {
+      isAlreadyBooked(auth.token, match.params.hotelId).then((res) => {
+        if (res.data.ok) setAlreadyBooked(res.data.ok);
+      });
+    }
   }, []);
 
   async function loadSellerHotel() {
@@ -19,6 +35,25 @@ function ViewHotel({ match }) {
     } catch (error) {
       toast.error("Error getting hotel image.");
     }
+  }
+
+  async function handleClick(event) {
+    event.preventDefault();
+
+    if (!auth || !auth.token) {
+      history.push("/login");
+      return;
+    }
+
+    setLoading(true);
+    if (!auth) history.push("/login");
+    let res = await getSessionId(auth.token, match.params.hotelId);
+    const stripe = await loadStripe(process.env.REACT_APP_STRIPE_KEY);
+    stripe
+      .redirectToCheckout({
+        sessionId: res.data.sessionId,
+      })
+      .then((result) => console.log(result));
   }
 
   return (
@@ -55,8 +90,18 @@ function ViewHotel({ match }) {
 
             <i>Posted by {hotel.postedBy && hotel.postedBy.name}</i>
             <br />
-            <button className="btn btn-block btn-lg btn-primary mt-3">
-              Book Now
+            <button
+              onClick={handleClick}
+              className="btn btn-block btn-lg btn-primary mt-3"
+              disabled={loading || alreadyBooked}
+            >
+              {loading
+                ? "Loading..."
+                : alreadyBooked
+                ? "Already Booked"
+                : auth && auth.token
+                ? "Book Now"
+                : "Login to book"}
             </button>
           </div>
         </div>

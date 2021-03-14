@@ -55,3 +55,28 @@ export async function updateHotel(token, data, hotelId) {
     }
   );
 }
+export async function userHotelBookings(token) {
+  return await axios.get(`${process.env.REACT_APP_API}/user-hotel-bookings`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
+export async function isAlreadyBooked(token, hotelId) {
+  return await axios.get(
+    `${process.env.REACT_APP_API}/is-already-booked/${hotelId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+}
+
+export async function searchListings(query) {
+  return await axios.post(
+    `${process.env.REACT_APP_API}/search-listings`,
+    query
+  );
+}

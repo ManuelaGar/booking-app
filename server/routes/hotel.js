@@ -8,6 +8,9 @@ import {
   remove,
   read,
   update,
+  userHotelBookings,
+  isAlreadyBooked,
+  searchListings,
 } from "../controllers/hotel";
 import { requireSignin, hotelOwner } from "../middlewares";
 
@@ -26,5 +29,8 @@ router.put(
   formidable(),
   update
 );
+router.get("/user-hotel-bookings", requireSignin, userHotelBookings);
+router.get("/is-already-booked/:hotelId", requireSignin, isAlreadyBooked);
+router.post("/search-listings", searchListings);
 
 module.exports = router;
